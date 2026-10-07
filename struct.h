@@ -1,4 +1,4 @@
-#define STRUCT_H
+#ifndef STRUCT_H
 #define STRUCT_H
 
 #include <stdio.h>
@@ -53,3 +53,4 @@ typedef struct Movimientos_dat {
     char patente[10];
 }mov_dat;
 
+#endif

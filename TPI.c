@@ -65,6 +65,7 @@ void submenuVeh(){
                 registrarVehiculo();
                 break;
             case 0:
+                system("cls");
                 break;
             default:
                 printf("\nOpcion invalida. Intente nuevamente.\n\n");
