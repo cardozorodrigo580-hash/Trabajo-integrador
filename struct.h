@@ -1,3 +1,6 @@
+#ifndef STRUCT_H
+#define STRUCT_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
@@ -48,3 +51,5 @@ typedef struct Movimientos_dat {
     long dni;
     char patente[10];
 }mov_dat;
+
+#endif
