@@ -1,4 +1,4 @@
-#ifndef STRUCT_H
+#define STRUCT_H
 #define STRUCT_H
 
 #include <stdio.h>
@@ -17,6 +17,7 @@ typedef struct Clientes_dat {
 
 
 typedef struct Vehiculos_dat {
+    int idVeh;
     char patente[10];
     char marca[20];
     char modelo[20];
@@ -52,4 +53,3 @@ typedef struct Movimientos_dat {
     char patente[10];
 }mov_dat;
 
-#endif
