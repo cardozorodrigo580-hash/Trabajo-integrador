@@ -1,7 +1,17 @@
+#define ARCHIVO_CLIENTES "clientes.dat"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "clientes.h"
+#include "struct.h"
+
+void menuClientes(void);
+void registrarCliente(void);
+void modificarCliente(void);
+void consultarCliente(void);
+int existeDNI(char dni[]);
+int buscarClientePorDNI(char dni[], struct Cliente *outCliente);
+void mostrarHistorialClienteTexto(char dni[]);
 
 // Recorre el archivo binario de clientes para verificar si existe un DNI registrado
 int existeDNI(char dni[]) {

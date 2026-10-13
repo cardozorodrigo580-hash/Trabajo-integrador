@@ -6,14 +6,17 @@
 #include <conio.h>
 
 
-typedef struct Clientes_dat {
-    long dni;
-    char nomApe[30];
-    long tel;
-    char email[20];
-    int fecha[3]; // [0] Día, [1] Mes, [2] Año
-    int estado;   // 1: Activo, 0: Inactivo
-}cli_dat;
+typedef struct Cliente{
+    char dni[10];
+    char apellidoNombre[60];
+    char telefono[20];
+    char email[50];
+    char direccion[60];
+    int diaAlta;
+    int mesAlta;
+    int anioAlta;
+    int estado; // 1: Activo, 0: Inactivo
+};
 
 
 typedef struct Vehiculos_dat {

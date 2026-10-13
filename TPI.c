@@ -17,7 +17,7 @@ void registrarCliente(void);
 void modificarCliente(void);
 void consultarCliente(void);
 int existeDNI(char dni[]);
-int buscarClientePorDNI(char dni[], struct cliente *outCliente);
+int buscarClientePorDNI(char dni[], struct Cliente *outCliente);
 void mostrarHistorialClienteTexto(char dni[]);
 
 int main() {
