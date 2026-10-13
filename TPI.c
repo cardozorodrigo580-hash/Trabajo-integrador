@@ -1,13 +1,24 @@
+#define ARCHIVO_CLIENTES "clientes.dat"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> 
 #include <conio.h>
 #include "struct.h"
 
+
+// Declaracion de funciones
 void submenuVeh();
 void registrarVehiculo();
 void listarVehiculo();
 int buscar_id(void);
+void menuClientes(void);
+void registrarCliente(void);
+void modificarCliente(void);
+void consultarCliente(void);
+int existeDNI(char dni[]);
+int buscarClientePorDNI(char dni[], struct cliente *outCliente);
+void mostrarHistorialClienteTexto(char dni[]);
 
 int main() {
     int opcion;
@@ -25,7 +36,7 @@ int main() {
 
         switch (opcion) {
             case 1:
-                printf("\n--- Gestion de Clientes ---\n\n");
+                menuClientes();
                 break;
             case 2:
                 submenuVeh();
@@ -135,6 +146,7 @@ void registrarVehiculo(){
         printf("Error de apertura de archivo\n");
     }
 }
+
 
 void listarVehiculo(){
     FILE * arch;
