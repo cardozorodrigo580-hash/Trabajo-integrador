@@ -1,12 +1,8 @@
 #ifndef STRUCT_H
 #define STRUCT_H
+#define ARCHIVO_CLIENTES "clientes.dat"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <conio.h>
-
-
-typedef struct Cliente{
+typedef struct Cliente_dat{
     char dni[10];
     char apellidoNombre[60];
     char telefono[20];
@@ -16,8 +12,16 @@ typedef struct Cliente{
     int mesAlta;
     int anioAlta;
     int estado; // 1: Activo, 0: Inactivo
-};
+}cli_dat;
 
+// Declaracion de prototipos
+void menuClientes(void);
+void registrarCliente(void);
+void modificarCliente(void);
+void consultarCliente(void);
+int existeDNI(char dni[]);
+int buscarClientePorDNI(char dni[],cli_dat *outCliente);
+void mostrarHistorialClienteTexto(char dni[]);
 
 typedef struct Vehiculos_dat {
     int idVeh;

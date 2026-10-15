@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "clientes.h"
+#include "struct.h"
 
 // Recorre el archivo binario de clientes para verificar si existe un DNI registrado
 int existeDNI(char dni[]) {
@@ -10,8 +10,8 @@ int existeDNI(char dni[]) {
         return 0;
     }
 
-    struct Cliente c;
-    while (fread(&c, sizeof(struct Cliente), 1, arch) == 1) {
+    cli_dat c;
+    while (fread(&c, sizeof( cli_dat), 1, arch) == 1) {
         if (strcmp(c.dni, dni) == 0) {
             fclose(arch);
             return 1;
@@ -23,14 +23,14 @@ int existeDNI(char dni[]) {
 }
 
 // Busca un cliente por su DNI y devuelve la estructura correspondiente por referencia
-int buscarClientePorDNI(char dni[], struct Cliente *outCliente) {
+int buscarClientePorDNI(char dni[],  cli_dat *outCliente) {
     FILE *arch = fopen(ARCHIVO_CLIENTES, "rb");
     if (arch == NULL) {
         return 0;
     }
 
-    struct Cliente c;
-    while (fread(&c, sizeof(struct Cliente), 1, arch) == 1) {
+    cli_dat c;
+    while (fread(&c, sizeof( cli_dat), 1, arch) == 1) {
         if (strcmp(c.dni, dni) == 0) {
             if (outCliente != NULL) {
                 *outCliente = c;
@@ -46,7 +46,7 @@ int buscarClientePorDNI(char dni[], struct Cliente *outCliente) {
 
 // Solicita los datos personales del cliente y guarda el registro en el archivo binario
 void registrarCliente(void) {
-    struct Cliente nuevo;
+    cli_dat nuevo;
     printf("\n=== REGISTRAR NUEVO CLIENTE ===\n");
 
     printf("Ingrese DNI: ");
@@ -89,7 +89,7 @@ void registrarCliente(void) {
         return;
     }
 
-    fwrite(&nuevo, sizeof(struct Cliente), 1, arch);
+    fwrite(&nuevo, sizeof(cli_dat), 1, arch);
     fclose(arch);
 
     printf("[EXITO] Cliente registrado correctamente.\n");
@@ -109,10 +109,10 @@ void modificarCliente(void) {
         return;
     }
 
-    struct Cliente c;
+    cli_dat c;
     int encontrado = 0;
 
-    while (fread(&c, sizeof(struct Cliente), 1, arch) == 1) {
+    while (fread(&c, sizeof(cli_dat), 1, arch) == 1) {
         if (strcmp(c.dni, dniBuscado) == 0) {
             encontrado = 1;
             printf("\nCliente encontrado: %s\n", c.apellidoNombre);
@@ -132,8 +132,8 @@ void modificarCliente(void) {
             printf("Estado (1: Activo, 0: Inactivo): ");
             scanf("%d", &c.estado);
 
-            fseek(arch, -((long)sizeof(struct Cliente)), SEEK_CUR);
-            fwrite(&c, sizeof(struct Cliente), 1, arch);
+            fseek(arch, -((long)sizeof(cli_dat)), SEEK_CUR);
+            fwrite(&c, sizeof(cli_dat), 1, arch);
             printf("[EXITO] Datos del cliente actualizados correctamente.\n");
             break;
         }
@@ -172,7 +172,7 @@ void consultarCliente(void) {
     printf("Ingrese DNI del cliente: ");
     scanf("%9s", dniBuscado);
 
-    struct Cliente c;
+    cli_dat c;
     if (buscarClientePorDNI(dniBuscado, &c)) {
         printf("\n----------------------------------------\n");
         printf("DNI:             %s\n", c.dni);

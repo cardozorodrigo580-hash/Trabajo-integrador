@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> 
-#include <conio.h>
 #include "struct.h"
-#include "clientes.h"
+#include "clientes.c"
+#include "alquileres.c"
+#include "movimientos.c"
 
 // Declaracion de funciones
 void submenuVeh();
@@ -33,10 +34,10 @@ int main() {
                 submenuVeh();
                 break;
             case 3:
-                printf("\n--- Gestion de Alquileres ---\n\n");
+                menuAlquileres();
                 break;
             case 4:
-                printf("\n--- Gestion de Movimientos ---\n\n");
+                menuMovimientos();
                 break;
             case 0:
                 printf("\nSaliendo del programa...\n");
