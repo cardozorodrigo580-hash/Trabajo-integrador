@@ -37,7 +37,7 @@ int main() {
                 menuAlquileres();
                 break;
             case 4:
-                menuMovimientos();
+                menumov();
                 break;
             case 0:
                 printf("\nSaliendo del programa...\n");
