@@ -5,8 +5,23 @@
 #include <stddef.h>
 #include "struct.h"
 
+// Retorna el ultimo nro de movimiento para autoincrementar el ID
+int obtnromov(void) {
+    FILE *arch = fopen("movimientos.dat", "rb");
+    if (arch == NULL) {
+        return 0;
+    }
+    mov_dat mov;
+    int ult = 0;
+    while (fread(&mov, sizeof(mov_dat), 1, arch) == 1) {
+        ult = mov.nromovimiento;
+    }
+    fclose(arch);
+    return ult;
+}
 
-int buscar(int nro) {
+// Busca la posicion del alquiler y recupera el DNI y la Patente
+int buscar(int nro, long *dni, char *patente) {
     FILE *arch = fopen("alquileres.dat", "rb");
     if (arch == NULL) {
         printf("No se pudo abrir el archivo o aun no hay alquileres registrados.\n");
@@ -20,6 +35,8 @@ int buscar(int nro) {
     while (fread(&alq, sizeof(alq_dat), 1, arch) == 1) {
         if (alq.nroalquiler == nro) {
             encontro = pos;
+            if (dni != NULL) *dni = alq.dni;
+            if (patente != NULL) strcpy(patente, alq.patente);
             break;
         }
         pos++;
@@ -27,9 +44,6 @@ int buscar(int nro) {
     fclose(arch);
     return encontro;
 }
-
-
-
 
 float btotal(int pos) {
     FILE *arch = fopen("alquileres.dat", "rb");
@@ -49,9 +63,6 @@ float btotal(int pos) {
     }
 }
 
-
-
-
 float bpagado(int pos) {
     FILE *arch = fopen("alquileres.dat", "rb");
     if (arch == NULL) {
@@ -70,16 +81,32 @@ float bpagado(int pos) {
     }
 }
 
+// Guarda/Actualiza el historial en movimientos_DNI.txt
+void actualizartxt(mov_dat mov) {
+    char nomarch[50];
+    sprintf(nomarch, "movimientos_%ld.txt", mov.dni);
+
+    FILE *archtxt = fopen(nomarch, "a");
+    if (archtxt != NULL) {
+        fprintf(archtxt, "Movimiento: %d | Alquiler: %d | Tipo: %d | Monto: $%.2f | Fecha: %02d/%02d/%d | Patente: %s\n",
+                mov.nromovimiento, mov.nroalquiler, mov.tipo_movimiento, mov.monto,
+                mov.fecha[0], mov.fecha[1], mov.fecha[2], mov.patente);
+        fclose(archtxt);
+    }
+}
 
 void rmov(void) {
-     int nro;
+    int nro;
     char opcion;
    
     printf("\n=== REGISTRO DE PAGO DE ALQUILER ===\n");
     printf("Ingrese el numero de alquiler: ");
     scanf("%d", &nro);
    
-    int pos = buscar(nro);
+    long dni_cli = 0;
+    char pat_veh[10] = "";
+    int pos = buscar(nro, &dni_cli, pat_veh);
+
     if (pos == -1) {
         printf("No se encontro el numero de alquiler especificado.\n");
         return;
@@ -101,12 +128,10 @@ void rmov(void) {
         int fecha[3];
         scanf("%d %d %d", &fecha[0], &fecha[1], &fecha[2]);
 
-
         if (monto > saldo) {
             printf("El monto ingresado es mayor al saldo pendiente.\n");
             return;
         }
-       
        
         FILE *arch1 = fopen("movimientos.dat", "ab");
         if (arch1 == NULL) {
@@ -115,16 +140,18 @@ void rmov(void) {
         }
        
         mov_dat mov;
+        mov.nromovimiento = obtnromov() + 1;
         mov.nroalquiler = nro;
         mov.tipo_movimiento = 1;
         mov.monto = monto;
         mov.fecha[0] = fecha[0];
         mov.fecha[1] = fecha[1];
         mov.fecha[2] = fecha[2];
+        mov.dni = dni_cli;
+        strcpy(mov.patente, pat_veh);
        
         fwrite(&mov, sizeof(mov_dat), 1, arch1);
         fclose(arch1);
-       
        
         FILE *arch = fopen("alquileres.dat", "r+b");
         if (arch == NULL) {
@@ -139,6 +166,10 @@ void rmov(void) {
         fclose(arch);
        
         printf("Pago registrado. Su nuevo saldo pendiente es: $%.2f\n", total - pagado);
+
+        // Actualiza el archivo de texto del cliente
+        actualizartxt(mov);
+
     } else if (opcion == 'n' || opcion == 'N') {
         printf("No se registro ningun pago.\n");
     } else {
@@ -146,16 +177,15 @@ void rmov(void) {
     }
 }
 
-
 void consultar(void) {  
-   int nro;
+    int nro;
    
     printf("\n=== CONSULTAR MOVIMIENTOS DE UN ALQUILER ===\n");
     printf("Ingrese el numero de alquiler a consultar: ");
     scanf("%d", &nro);
    
     // 1. Validar si el alquiler existe en el archivo principal ("alquileres.dat")
-    int pos = buscar(nro);
+    int pos = buscar(nro, NULL, NULL);
     if (pos == -1) {
         printf("[ERROr] El numero de alquiler %d no existe en el sistema.\n", nro);
         return;
@@ -177,6 +207,9 @@ void consultar(void) {
     while (fread(&mov, sizeof(mov_dat), 1, arch) == 1) {
         if (mov.nroalquiler == nro) {
             encontrados++;
+            printf("  > Nro Movimiento  : %d\n", mov.nromovimiento);
+            printf("  > DNI Cliente     : %ld\n", mov.dni);
+            printf("  > Patente         : %s\n", mov.patente);
             printf("  > Tipo Movimiento : %d\n", mov.tipo_movimiento);
             printf("  > Monto pagado    : $%.2f\n", mov.monto);
             printf("  > Fecha del pago  : %02d/%02d/%d\n", mov.fecha[0], mov.fecha[1], mov.fecha[2]);
@@ -184,7 +217,7 @@ void consultar(void) {
         }
     }
    
-    // 4. Validar si el alquiler existía pero no tenía pagos registrados
+    // 4. Validar si el alquiler existia pero no tenia pagos registrados
     if (encontrados == 0) {
         printf("[INFo] El alquiler existe, pero todavia no registra pagos.\n");
     } else {
@@ -193,7 +226,6 @@ void consultar(void) {
    
     fclose(arch);
 }
-
 
 void menumov(void) {
     int opt;
