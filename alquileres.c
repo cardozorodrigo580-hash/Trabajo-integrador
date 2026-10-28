@@ -284,8 +284,6 @@ void registrarAlquiler() {
         }                
     }
 }
-}
-}
 
 long convertirFechaADias(int d, int m, int a) {
     int diasMes[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};

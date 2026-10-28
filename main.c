@@ -2,10 +2,6 @@
 #include <stdlib.h>
 #include <string.h> 
 #include "struct.h"
-#include "clientes.c"
-#include "alquileres.c"
-#include "movimientos.c"
-#include "vehiculos.c"
 
 // Declaracion de funciones
 void submenuVeh();
