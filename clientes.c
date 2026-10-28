@@ -101,7 +101,7 @@ void modificarCliente(void) {
     printf("\n=== MODIFICAR DATOS DE CLIENTE ===\n");
     printf("Ingrese el DNI del cliente a modificar: ");
     scanf("%9s", dniBuscado);
-    getchar();
+    while (getchar() != '\n'); 
 
     FILE *arch = fopen(ARCHIVO_CLIENTES, "rb+");
     if (arch == NULL) {
@@ -111,36 +111,74 @@ void modificarCliente(void) {
 
     cli_dat c;
     int encontrado = 0;
+    char aux[100]; // Variable auxiliar para las modificaciones
 
     while (fread(&c, sizeof(cli_dat), 1, arch) == 1) {
         if (strcmp(c.dni, dniBuscado) == 0) {
             encontrado = 1;
             printf("\nCliente encontrado: %s\n", c.apellidoNombre);
+            printf("(Si desea mantener el dato actual, solo presione Enter)\n\n");
 
+            // Modificar Apellido y Nombre
+            printf("Ingrese Nuevo Apellido y Nombre (actual: %s): ", c.apellidoNombre);
+            fgets(aux, sizeof(aux), stdin);
+            aux[strcspn(aux, "\n")] = 0;
+            if (strlen(aux) > 0) {
+                strcpy(c.apellidoNombre, aux);
+            }
+
+            //Modificar Teléfono
             printf("Ingrese Nuevo Telefono (actual: %s): ", c.telefono);
-            fgets(c.telefono, sizeof(c.telefono), stdin);
-            c.telefono[strcspn(c.telefono, "\n")] = 0;
+            fgets(aux, sizeof(aux), stdin);
+            aux[strcspn(aux, "\n")] = 0;
+            if (strlen(aux) > 0) {
+                strcpy(c.telefono, aux);
+            }
 
+            // Modificar Email
             printf("Ingrese Nuevo Email (actual: %s): ", c.email);
-            fgets(c.email, sizeof(c.email), stdin);
-            c.email[strcspn(c.email, "\n")] = 0;
+            fgets(aux, sizeof(aux), stdin);
+            aux[strcspn(aux, "\n")] = 0;
+            if (strlen(aux) > 0) {
+                strcpy(c.email, aux);
+            }
 
-            printf("Ingrese Nueva Direccion (actual: %s): ", c.direccion);
-            fgets(c.direccion, sizeof(c.direccion), stdin);
-            c.direccion[strcspn(c.direccion, "\n")] = 0;
+            // modificar Dirección
+            printf("Ingrese Nuevo Direccion (actual: %s): ", c.direccion);
+            fgets(aux, sizeof(aux), stdin);
+            aux[strcspn(aux, "\n")] = 0;
+            if (strlen(aux) > 0) {
+                strcpy(c.direccion, aux);
+            }
 
-            printf("Estado (1: Activo, 0: Inactivo): ");
-            scanf("%d", &c.estado);
+            // modificar Estado con validación
+            printf("Estado actual (%d) [1: Activo, 0: Inactivo]: ", c.estado);
+            char bufferEstado[20];
+            fgets(bufferEstado, sizeof(bufferEstado), stdin);
+            bufferEstado[strcspn(bufferEstado, "\n")] = 0;
+            
+            if (strlen(bufferEstado) > 0) {
+                int nuevoEstado = atoi(bufferEstado);
+                while (nuevoEstado != 0 && nuevoEstado != 1) {
+                    printf("[ERROR] Valor invalido. Ingrese 1 para Activo o 0 para Inactivo: ");
+                    fgets(bufferEstado, sizeof(bufferEstado), stdin);
+                    bufferEstado[strcspn(bufferEstado, "\n")] = 0;
+                    nuevoEstado = atoi(bufferEstado);
+                }
+                c.estado = nuevoEstado;
+            }
 
-            fseek(arch, -((long)sizeof(cli_dat)), SEEK_CUR);
+            //registro actual y pisarlo con la estructura modificada
+            fseek(arch, -(long)sizeof(cli_dat), SEEK_CUR);
             fwrite(&c, sizeof(cli_dat), 1, arch);
-            printf("[EXITO] Datos del cliente actualizados correctamente.\n");
+            printf("\n[EXITO] Datos del cliente actualizados correctamente.\n");
             break;
         }
     }
 
+    
     if (!encontrado) {
-        printf("[ERROR] No se encontro un cliente con el DNI %s.\n", dniBuscado);
+        printf("\n[ERROR] No se encontro un cliente con el DNI %s.\n", dniBuscado);
     }
 
     fclose(arch);
